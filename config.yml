@@ -1,0 +1,8 @@
+clickhouse:
+  host: "192.168.65.250"
+  port: "9000"
+
+solana:
+  servers:
+    - "https://api.mainnet-beta.solana.com"
+    - "https://solana-api.projectserum.com"
