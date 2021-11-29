@@ -40,12 +40,14 @@ func LoadConfig() *config {
 		os.Exit(1)
 	}
 
-	cfg.Port = *(flag.Int("port", 8090, "HTTP Port"))
+	port := flag.Int("port", 8090, "HTTP Port")
 	cmdClickHost := flag.String("click-host", "", "Host to clickhouse database (Required)")
 	cmdClickPort := flag.String("click-port", "", "Port to clickhouse database  (Required)")
 
 
 	flag.Parse()
+
+	cfg.Port = *port
 
 	if len(*cmdClickHost) > 0 {
 		cfg.Clickhouse.Host = *cmdClickHost
