@@ -76,14 +76,15 @@ func (env *Env) PairPrices(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 
-	if period == "24H" {
-		rows, err = env.CH.Query("SELECT avg(price) as price, toStartOfTenMinutes(changeDate) AS change FROM prices WHERE pair = ? AND changeDate > now() - INTERVAL 24 HOUR GROUP BY toStartOfTenMinutes(changeDate) ORDER BY toStartOfTenMinutes(changeDate) ASC", pair)
-	} else if period == "7D" {
-		rows, err = env.CH.Query("select avg(price) as price, toStartOfHour(changeDate) as change from prices where pair = ? and changeDate > now() - INTERVAL 7 DAY group By toStartOfHour(changeDate) order by toStartOfHour(changeDate) asc", pair)
-	} else if period == "1M" {
-		rows, err = env.CH.Query("select avg(price) as price, toStartOfDay(changeDate) as change from prices where pair = ? and changeDate > now() - INTERVAL 1 MONTH group By toStartOfDay(changeDate) order by toStartOfDay(changeDate) asc", pair)
-	} else if period == "3M" {
-		rows, err = env.CH.Query("select avg(price) as price, toStartOfDay(changeDate) as change from prices where pair = ? and changeDate > now() - INTERVAL 3 MONTH group By toStartOfDay(changeDate) order by toStartOfDay(changeDate) asc", pair)
+	switch period {
+	case "24H":
+		rows, err = env.CH.Query("SELECT avg(price) AS price, toStartOfTenMinutes(changeDate) AS change FROM prices WHERE pair = ? AND changeDate > now() - INTERVAL 24 HOUR GROUP BY toStartOfTenMinutes(changeDate) ORDER BY toStartOfTenMinutes(changeDate)", pair)
+	case "7D":
+		rows, err = env.CH.Query("SELECT avg(price) AS price, toStartOfHour(changeDate) AS change FROM prices WHERE pair = ? AND changeDate > now() - INTERVAL 7 DAY group By toStartOfHour(changeDate) ORDER BY toStartOfHour(changeDate)", pair)
+	case "1M":
+		rows, err = env.CH.Query("SELECT avg(price) AS price, toStartOfDay(changeDate) AS change FROM prices WHERE pair = ? AND changeDate > now() - INTERVAL 1 MONTH group By toStartOfDay(changeDate) ORDER BY toStartOfDay(changeDate)", pair)
+	case "3M":
+		rows, err = env.CH.Query("SELECT avg(price) AS price, toStartOfDay(changeDate) AS change FROM prices WHERE pair = ? AND changeDate > now() - INTERVAL 3 MONTH group By toStartOfDay(changeDate) ORDER BY toStartOfDay(changeDate)", pair)
 	}
 
 	if err != nil {
@@ -120,7 +121,7 @@ func (env *Env) SearchPairs(w http.ResponseWriter, r *http.Request) {
 	var rows *sql.Rows
 	var err error
 
-	rows, err = env.CH.Query("SELECT DISTINCT pair FROM prices WHERE lowerUTF8(pair) LIKE ?", "%" + query + "%")
+	rows, err = env.CH.Query("SELECT DISTINCT pair FROM prices WHERE lowerUTF8(pair) LIKE '%?%'",  query)
 	if err != nil {
 		fmt.Println(err)
 	}
